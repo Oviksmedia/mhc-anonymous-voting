@@ -18,6 +18,7 @@ export default function VotingSystem() {
   const [nominee, setNominee] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
 
   const stepIndex = STEPS.indexOf(step);
 
@@ -222,28 +223,35 @@ export default function VotingSystem() {
                       </motion.div>
                     )}
 
-                    <button
-                      onClick={validateCode}
-                      disabled={loading || code.length < 5}
-                      style={{
-                        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                        padding: '16px', borderRadius: '14px', border: 'none', cursor: loading || code.length < 5 ? 'not-allowed' : 'pointer',
-                        background: loading || code.length < 5 ? '#B2D4D5' : 'linear-gradient(135deg, #0D7377 0%, #14919B 100%)',
-                        color: 'white', fontSize: '15px', fontWeight: 700,
-                        boxShadow: loading || code.length < 5 ? 'none' : '0 4px 16px rgba(13,115,119,0.35)',
-                        transition: 'all 0.25s',
-                      }}
-                    >
-                      {loading ? <Loader2 style={{ width: '20px', height: '20px', animation: 'spin 1s linear infinite' }} /> : <><span>Continue</span><ArrowRight style={{ width: '18px', height: '18px' }} /></>}
-                    </button>
-                  </div>
+                      <button
+                        onClick={validateCode}
+                        disabled={loading || code.length < 5}
+                        style={{
+                          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                          padding: '16px', borderRadius: '14px', border: 'none', cursor: loading || code.length < 5 ? 'not-allowed' : 'pointer',
+                          background: loading || code.length < 5 ? '#B2D4D5' : 'linear-gradient(135deg, #0D7377 0%, #14919B 100%)',
+                          color: 'white', fontSize: '15px', fontWeight: 700,
+                          boxShadow: loading || code.length < 5 ? 'none' : '0 4px 16px rgba(13,115,119,0.35)',
+                          transition: 'all 0.25s',
+                        }}
+                      >
+                        {loading ? <Loader2 style={{ width: '20px', height: '20px', animation: 'spin 1s linear infinite' }} /> : <><span>Continue</span><ArrowRight style={{ width: '18px', height: '18px' }} /></>}
+                      </button>
 
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '20px', color: '#9DAAB8', fontSize: '12px' }}>
-                    <Lock style={{ width: '12px', height: '12px' }} />
-                    Your identity remains 100% anonymous
-                  </div>
-                </motion.div>
-              )}
+                      <button 
+                        onClick={() => setShowHelp(true)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9DAAB8', fontSize: '12px', fontWeight: 600, textDecoration: 'underline', marginTop: '4px' }}
+                      >
+                        See how it works
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-1.5 text-[12px] text-[#8E9BAA]">
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      Your identity remains 100% anonymous
+                    </div>
+                  </motion.div>
+                )}
 
               {/* ── STEP 2 ── */}
               {step === 'vote' && (
@@ -350,6 +358,42 @@ export default function VotingSystem() {
           </div>
         </motion.div>
       </div>
+
+      <AnimatePresence>
+        {showHelp && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowHelp(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(5, 46, 48, 0.85)', backdropFilter: 'blur(8px)' }} />
+            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} style={{ position: 'relative', background: 'white', borderRadius: '24px', width: '100%', maxWidth: '400px', padding: '32px', boxShadow: '0 20px 50px rgba(0,0,0,0.3)' }}>
+              <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#F0FDF4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                  <ShieldCheck style={{ width: '28px', height: '28px', color: '#16A34A' }} />
+                </div>
+                <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#0F1F2E', margin: '0 0 8px' }}>Privacy & Integrity</h3>
+                <p style={{ fontSize: '14px', color: '#6B7C93' }}>How we protect your anonymous vote</p>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div style={{ display: 'flex', gap: '16px' }}>
+                  <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#0D7377', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, flexShrink: 0 }}>1</div>
+                  <p style={{ fontSize: '13px', color: '#4B5563', lineHeight: 1.5 }}><strong>Validation:</strong> Your code is verified against a list of 50 authorized tickets.</p>
+                </div>
+                <div style={{ display: 'flex', gap: '16px' }}>
+                  <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#0D7377', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, flexShrink: 0 }}>2</div>
+                  <p style={{ fontSize: '13px', color: '#4B5563', lineHeight: 1.5 }}><strong>Severing:</strong> Once you vote, the system marks the code as used and permanently severs the link to the vote.</p>
+                </div>
+                <div style={{ display: 'flex', gap: '16px' }}>
+                  <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#0D7377', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 700, flexShrink: 0 }}>3</div>
+                  <p style={{ fontSize: '13px', color: '#4B5563', lineHeight: 1.5 }}><strong>Anonymity:</strong> Your vote is dropped into a "blind box." No one—including IT—can see which code cast which vote.</p>
+                </div>
+              </div>
+
+              <button onClick={() => setShowHelp(false)} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: 'none', background: '#0D7377', color: 'white', fontWeight: 700, marginTop: '32px', cursor: 'pointer' }}>
+                Got it, thanks!
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');

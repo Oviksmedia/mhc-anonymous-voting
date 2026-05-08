@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🗳️ MHC Anonymous Voting Portal
+### Nurses Week 2026 | Maryland Healthcare
 
-## Getting Started
+A premium, high-trust voting system designed to ensure **one-vote-per-person integrity** while maintaining **100% voter anonymity**. Built for Maryland Healthcare staff to nominate the "Most Hardworking Nurse" with total confidence in the privacy of their ballot.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🔒 Security & Anonymity Model: "The Blind Box"
+The system utilizes a decoupled architecture to prevent any possibility of tracing a vote back to a specific staff member.
+
+1.  **Single-Use Tokens**: Every staff member is issued a unique, 6-digit alphanumeric access code.
+2.  **Atomic Transactions**: The system uses a PostgreSQL RPC function (`cast_anonymous_vote`) that marks a token as used and records the vote in a single, non-reversible step.
+3.  **Data Decoupling**: There is **no Foreign Key** or logical link between the `votes` table and the `voter_tokens` table. Once a vote is cast, the connection to the access code is severed forever.
+4.  **Admin Protection**: The results dashboard is secured with an administrative password, preventing public access to real-time nomination data.
+
+## 🚀 Tech Stack
+*   **Frontend**: Next.js 14 (App Router), Tailwind CSS, Framer Motion, Lucide React.
+*   **Backend**: Supabase (Database, Auth, Edge Functions).
+*   **Deployment**: Vercel (Automatic CI/CD via GitHub).
+*   **Design**: "Premium Deep Navy" institutional design system.
+
+---
+
+## 🛠️ Setup & Operations
+
+### 1. Database Configuration
+Run the following SQL in your Supabase Editor to initialize the security logic:
+```sql
+-- Creates the atomic voting function
+create or replace function cast_anonymous_vote(target_code text, nominee text)
+returns json as $$
+begin
+  if exists (select 1 from voter_tokens where code = target_code and is_used = false) then
+    update voter_tokens set is_used = true where code = target_code;
+    insert into votes (nominee_name) values (nominee);
+    return json_build_object('success', true);
+  else
+    return json_build_object('success', false, 'message', 'Code invalid or already used');
+  end if;
+end;
+$$ language plpgsql;
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Admin Dashboard
+The dashboard is accessible at `/results`. 
+*   **Admin Password**: `admin-mhc-2026`
+*   **Metrics**: Shows total participation (goal: 50 staff), live standings, and sync status.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📋 Distribution Workflow
+1.  **Generate Codes**: Run the `insert_tokens.sql` script in Supabase.
+2.  **Export**: Export the `voter_tokens` table as a CSV or text file.
+3.  **Distribute**: Send codes to staff via WhatsApp/Email. Each code can only be used once.
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+© 2026 Maryland Healthcare. Institutional Grade Internal Tools.
