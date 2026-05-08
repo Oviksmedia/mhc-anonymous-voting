@@ -66,7 +66,7 @@ export default function ResultsPage() {
 
   if (!authorized) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-[#050505] font-inter">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-background font-inter">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-secondary/10 rounded-full blur-[120px]" />
         </div>
@@ -109,11 +109,11 @@ export default function ResultsPage() {
   const participationRate = Math.round((totalVotes / TOTAL_STAFF) * 100);
 
   return (
-    <div className="min-h-screen bg-[#050505] font-inter text-white pb-20">
+    <div className="min-h-screen bg-background font-inter text-white pb-20">
       {/* Background Decor */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-secondary/5 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[20%] left-[-10%] w-[30%] h-[30%] bg-primary/10 rounded-full blur-[120px]" />
+        <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-secondary/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[20%] left-[-10%] w-[30%] h-[30%] bg-primary/20 rounded-full blur-[120px]" />
       </div>
 
       <nav className="border-b border-white/5 bg-black/20 backdrop-blur-md sticky top-0 z-50">

@@ -1,24 +1,28 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #003366;
+  --color-primary: #002B5B;
   --color-secondary: #00A3E0;
   --color-accent: #FFD700;
-  --color-background: #050505;
-  --color-card: rgba(255, 255, 255, 0.05);
-  --color-border: rgba(255, 255, 255, 0.1);
+  --color-background: #001529; /* Deep Medical Navy */
+  --color-card: rgba(255, 255, 255, 0.03);
+  --color-border: rgba(255, 255, 255, 0.08);
 }
 
 :root {
-  --background: #050505;
+  --background: #001529;
   --foreground: #ffffff;
 }
 
 body {
   background: var(--background);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(0, 163, 224, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(0, 43, 91, 0.2) 0px, transparent 50%);
   color: var(--foreground);
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
+  min-height: 100vh;
 }
 
 .glass-card {
