@@ -118,11 +118,13 @@ export default function ResultsPage() {
 
       <nav className="border-b border-white/5 bg-black/20 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="MHC" className="h-10 w-auto" />
-            <div className="h-6 w-px bg-white/10 mx-2" />
-            <h1 className="text-lg font-bold tracking-tight outfit">
-              MARYLAND <span className="text-secondary">HEALTHCARE</span>
+          <div className="flex items-center gap-4">
+            <div className="bg-white p-2 rounded-xl shadow-sm border border-white/10">
+              <img src="/logo.png" alt="MHC" className="h-8 w-auto" />
+            </div>
+            <div className="h-6 w-px bg-white/10 mx-1" />
+            <h1 className="text-lg font-bold tracking-tight outfit leading-none">
+              MARYLAND <br/> <span className="text-secondary text-[10px] uppercase tracking-[0.2em]">Healthcare</span>
             </h1>
           </div>
           <div className="flex items-center gap-4">

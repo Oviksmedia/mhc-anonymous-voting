@@ -90,12 +90,22 @@ export default function VotingSystem() {
             className="flex flex-col items-center gap-4 mb-4"
           >
             <div className="relative group">
-              <div className="absolute inset-0 bg-secondary/20 blur-xl rounded-full group-hover:bg-secondary/30 transition-colors" />
-              <img 
-                src="/logo.png" 
-                alt="Maryland Healthcare" 
-                className="h-20 w-auto relative z-10 drop-shadow-2xl"
-              />
+              {/* Outer Glow */}
+              <div className="absolute inset-[-20px] bg-secondary/10 blur-[40px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+              
+              {/* Logo Badge Container */}
+              <div className="relative z-10 bg-white p-3 rounded-[2rem] shadow-[0_0_40px_rgba(0,163,224,0.15)] border border-white/20 transition-transform duration-500 group-hover:scale-105">
+                <img 
+                  src="/logo.png" 
+                  alt="Maryland Healthcare" 
+                  className="h-14 w-auto object-contain"
+                />
+              </div>
+              
+              {/* Floating Decorative Elements */}
+              <div className="absolute -top-2 -right-2 bg-secondary text-black p-1.5 rounded-full shadow-lg z-20">
+                <Award className="w-3 h-3" />
+              </div>
             </div>
             <div className="space-y-1">
               <h1 className="text-2xl font-bold tracking-tight text-white/90">
