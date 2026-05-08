@@ -88,20 +88,21 @@ export default function VotingSystem() {
             <img src="/logo.png" alt="Maryland Healthcare" style={{ height: '52px', width: 'auto', display: 'block' }} />
           </div>
 
-          <div style={{ marginBottom: '10px' }}>
+          <div style={{ marginBottom: '12px' }}>
             <span style={{
-              display: 'inline-flex', alignItems: 'center', gap: '6px',
-              background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: '100px', padding: '5px 14px',
-              fontSize: '11px', fontWeight: 700, letterSpacing: '0.15em',
-              color: 'rgba(255,255,255,0.9)', textTransform: 'uppercase',
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              background: 'rgba(255,255,255,0.18)', border: '1.5px solid rgba(255,255,255,0.3)',
+              borderRadius: '100px', padding: '6px 16px',
+              fontSize: '12px', fontWeight: 900, letterSpacing: '0.2em',
+              color: '#FFFFFF', textTransform: 'uppercase',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
             }}>
-              <Star style={{ width: '10px', height: '10px', fill: '#FFD700', color: '#FFD700' }} />
-              Nurses Week 2026
+              <Star style={{ width: '12px', height: '12px', fill: '#FFD700', color: '#FFD700' }} />
+              NURSES WEEK 2026
             </span>
           </div>
 
-          <h1 style={{ fontSize: '34px', fontWeight: 800, color: '#FFFFFF', margin: '12px 0 6px', letterSpacing: '-0.5px', lineHeight: 1.2 }}>
+          <h1 style={{ fontSize: '38px', fontWeight: 900, color: '#FFFFFF', margin: '14px 0 8px', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
             Most Hardworking Nurse
           </h1>
           <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>
