@@ -3,7 +3,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
-import { CheckCircle2, AlertCircle, Loader2, Heart, ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';
+import {
+  CheckCircle2, AlertCircle, Loader2, Heart,
+  ShieldCheck, ArrowRight, Lock, Star
+} from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 type Step = 'code' | 'vote' | 'success';
@@ -19,235 +22,315 @@ export default function VotingSystem() {
   const stepIndex = STEPS.indexOf(step);
 
   const validateCode = async () => {
-    setLoading(true);
-    setError(null);
+    setLoading(true); setError(null);
     try {
-      const { data, error: supabaseError } = await supabase
-        .from('voter_tokens')
-        .select('*')
-        .eq('code', code.toUpperCase().trim())
-        .eq('is_used', false)
-        .single();
-      if (supabaseError || !data) {
-        setError('Invalid or already used access code. Please check and try again.');
-      } else {
-        setStep('vote');
-      }
-    } catch {
-      setError('Something went wrong. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+      const { data, error: e } = await supabase
+        .from('voter_tokens').select('*')
+        .eq('code', code.toUpperCase().trim()).eq('is_used', false).single();
+      if (e || !data) setError('Invalid or already used access code.');
+      else setStep('vote');
+    } catch { setError('Something went wrong. Please try again.'); }
+    finally { setLoading(false); }
   };
 
   const submitVote = async () => {
     if (!nominee.trim()) { setError('Please enter a name.'); return; }
-    setLoading(true);
-    setError(null);
+    setLoading(true); setError(null);
     try {
-      const { data, error: rpcError } = await supabase.rpc('cast_anonymous_vote', {
-        target_code: code.toUpperCase().trim(),
-        nominee: nominee.trim()
+      const { data, error: e } = await supabase.rpc('cast_anonymous_vote', {
+        target_code: code.toUpperCase().trim(), nominee: nominee.trim()
       });
-      if (rpcError || (data && !data.success)) {
-        setError(rpcError?.message || data?.message || 'Failed to record vote.');
-      } else {
+      if (e || (data && !data.success)) setError(e?.message || data?.message || 'Failed to record vote.');
+      else {
         setStep('success');
-        confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 }, colors: ['#0D7377', '#14919B', '#E8B931', '#00A3E0'] });
+        confetti({ particleCount: 220, spread: 100, origin: { y: 0.55 }, colors: ['#0D7377', '#14919B', '#FFD700', '#fff'] });
       }
-    } catch {
-      setError('Connection error. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    } catch { setError('Connection error. Please try again.'); }
+    finally { setLoading(false); }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#EAF6F7] via-white to-[#F0F9FF]">
-      {/* Top Stripe */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-[#0D7377] via-[#14919B] to-[#00A3E0] shrink-0" />
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#F4F7F9', fontFamily: "'Inter', system-ui, sans-serif" }}>
 
-      {/* Scrollable Content Area */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
+      {/* ═══════════════════════════════════════════════
+          HERO — Deep Teal Brand Section
+      ═══════════════════════════════════════════════ */}
+      <div style={{
+        background: 'linear-gradient(160deg, #052E30 0%, #0A4F53 50%, #0D7377 100%)',
+        paddingTop: '56px',
+        paddingBottom: '100px',
+        paddingLeft: '24px',
+        paddingRight: '24px',
+        textAlign: 'center',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* Decorative circles */}
+        <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '240px', height: '240px', borderRadius: '50%', background: 'rgba(255,255,255,0.04)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: '-40px', left: '-40px', width: '180px', height: '180px', borderRadius: '50%', background: 'rgba(255,255,255,0.03)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: '20%', left: '10%', width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255,255,255,0.15)' }} />
+        <div style={{ position: 'absolute', top: '60%', right: '15%', width: '4px', height: '4px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }} />
+
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full max-w-md"
+          transition={{ duration: 0.6 }}
         >
-          {/* ─── HEADER ─── */}
-          <div className="text-center mb-8 space-y-4">
-            <img
-              src="/logo.png"
-              alt="Maryland Healthcare"
-              className="h-14 w-auto mx-auto"
-            />
-            <div className="space-y-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-[0.15em] text-[#0D7377] bg-[#0D7377]/8 border border-[#0D7377]/15">
-                <Sparkles className="w-3 h-3" />
-                Nurses Week 2026
-              </span>
-              <h1 className="text-[28px] font-bold text-[#1A2332] tracking-tight leading-tight">
-                Most Hardworking Nurse
-              </h1>
-              <p className="text-[15px] text-[#5A6B7F]">Honoring Excellence in Care</p>
-            </div>
+          {/* Logo on dark — perfectly readable */}
+          <div style={{
+            display: 'inline-block',
+            background: 'white',
+            borderRadius: '20px',
+            padding: '14px 20px',
+            marginBottom: '28px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+          }}>
+            <img src="/logo.png" alt="Maryland Healthcare" style={{ height: '52px', width: 'auto', display: 'block' }} />
           </div>
 
-          {/* ─── STEP INDICATOR ─── */}
-          <div className="flex items-center justify-center gap-2 mb-6">
+          <div style={{ marginBottom: '10px' }}>
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: '100px', padding: '5px 14px',
+              fontSize: '11px', fontWeight: 700, letterSpacing: '0.15em',
+              color: 'rgba(255,255,255,0.9)', textTransform: 'uppercase',
+            }}>
+              <Star style={{ width: '10px', height: '10px', fill: '#FFD700', color: '#FFD700' }} />
+              Nurses Week 2026
+            </span>
+          </div>
+
+          <h1 style={{ fontSize: '34px', fontWeight: 800, color: '#FFFFFF', margin: '12px 0 6px', letterSpacing: '-0.5px', lineHeight: 1.2 }}>
+            Most Hardworking Nurse
+          </h1>
+          <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>
+            Honoring Excellence in Care — Maryland Healthcare
+          </p>
+        </motion.div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════
+          CARD — Floats over the hero bottom
+      ═══════════════════════════════════════════════ */}
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '0 20px 48px',
+        marginTop: '-64px',
+        position: 'relative',
+        zIndex: 10,
+      }}>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          style={{ width: '100%', maxWidth: '440px' }}
+        >
+          {/* Step Indicator */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '20px' }}>
             {STEPS.map((s, i) => (
               <React.Fragment key={s}>
-                <div className={`
-                  w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-400
-                  ${i === stepIndex ? 'bg-[#0D7377] text-white ring-4 ring-[#0D7377]/20' :
-                    i < stepIndex ? 'bg-[#10B981] text-white' :
-                    'bg-white text-[#8E9BAA] border border-[#E5EAF0]'}
-                `}>
+                <div style={{
+                  width: '32px', height: '32px', borderRadius: '50%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '12px', fontWeight: 700,
+                  background: i === stepIndex ? '#FFFFFF' : i < stepIndex ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.15)',
+                  color: i === stepIndex ? '#0D7377' : i < stepIndex ? '#0A4F53' : 'rgba(255,255,255,0.6)',
+                  boxShadow: i === stepIndex ? '0 2px 12px rgba(0,0,0,0.15)' : 'none',
+                  transition: 'all 0.4s',
+                }}>
                   {i < stepIndex ? '✓' : i + 1}
                 </div>
-                {i < 2 && (
-                  <div className={`w-14 h-0.5 rounded-full transition-colors duration-400 ${i < stepIndex ? 'bg-[#10B981]' : 'bg-[#E5EAF0]'}`} />
-                )}
+                {i < 2 && <div style={{ width: '40px', height: '2px', borderRadius: '2px', background: i < stepIndex ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)', transition: 'background 0.4s' }} />}
               </React.Fragment>
             ))}
           </div>
 
-          {/* ─── MAIN CARD ─── */}
-          <div
-            className="bg-white rounded-3xl shadow-[0_2px_8px_rgba(0,0,0,0.06),0_16px_48px_rgba(0,0,0,0.08)] border border-[#E5EAF0]"
-            style={{ borderTop: '3px solid #0D7377' }}
-          >
-            <div className="p-8">
-              <AnimatePresence mode="wait">
+          {/* The Card */}
+          <div style={{
+            background: '#FFFFFF',
+            borderRadius: '24px',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.04), 0 20px 60px rgba(0,0,0,0.12)',
+            overflow: 'hidden',
+          }}>
+            <AnimatePresence mode="wait">
 
-                {/* ── STEP 1: Code ── */}
-                {step === 'code' && (
-                  <motion.div key="code" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.3 }} className="space-y-6">
+              {/* ── STEP 1 ── */}
+              {step === 'code' && (
+                <motion.div key="code" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.28 }} style={{ padding: '36px 32px' }}>
+                  <div style={{ marginBottom: '24px' }}>
+                    <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#0F1F2E', margin: '0 0 8px' }}>Enter Access Code</h2>
+                    <p style={{ fontSize: '14px', color: '#6B7C93', lineHeight: 1.6, margin: 0 }}>
+                      Enter the unique code sent to you via WhatsApp. Each code is valid for one vote only.
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <input
+                      type="text"
+                      placeholder="MHC-XXXXXX"
+                      value={code}
+                      onChange={e => setCode(e.target.value.toUpperCase())}
+                      onKeyDown={e => e.key === 'Enter' && validateCode()}
+                      style={{
+                        width: '100%', background: '#F6F8FA', border: '2px solid #E8ECF0',
+                        borderRadius: '14px', padding: '16px 20px', fontSize: '22px',
+                        fontFamily: 'monospace', fontWeight: 600, letterSpacing: '0.2em',
+                        textAlign: 'center', color: '#0F1F2E', boxSizing: 'border-box',
+                        outline: 'none', transition: 'border-color 0.2s',
+                      }}
+                      onFocus={e => e.target.style.borderColor = '#0D7377'}
+                      onBlur={e => e.target.style.borderColor = '#E8ECF0'}
+                    />
+
+                    {error && (
+                      <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} style={{
+                        display: 'flex', alignItems: 'flex-start', gap: '10px',
+                        padding: '12px 16px', borderRadius: '12px',
+                        background: '#FEF2F2', border: '1px solid #FECACA',
+                        color: '#DC2626', fontSize: '13px', lineHeight: 1.5,
+                      }}>
+                        <AlertCircle style={{ width: '16px', height: '16px', flexShrink: 0, marginTop: '1px' }} />
+                        {error}
+                      </motion.div>
+                    )}
+
+                    <button
+                      onClick={validateCode}
+                      disabled={loading || code.length < 5}
+                      style={{
+                        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                        padding: '16px', borderRadius: '14px', border: 'none', cursor: loading || code.length < 5 ? 'not-allowed' : 'pointer',
+                        background: loading || code.length < 5 ? '#B2D4D5' : 'linear-gradient(135deg, #0D7377 0%, #14919B 100%)',
+                        color: 'white', fontSize: '15px', fontWeight: 700,
+                        boxShadow: loading || code.length < 5 ? 'none' : '0 4px 16px rgba(13,115,119,0.35)',
+                        transition: 'all 0.25s',
+                      }}
+                    >
+                      {loading ? <Loader2 style={{ width: '20px', height: '20px', animation: 'spin 1s linear infinite' }} /> : <><span>Continue</span><ArrowRight style={{ width: '18px', height: '18px' }} /></>}
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginTop: '20px', color: '#9DAAB8', fontSize: '12px' }}>
+                    <Lock style={{ width: '12px', height: '12px' }} />
+                    Your identity remains 100% anonymous
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ── STEP 2 ── */}
+              {step === 'vote' && (
+                <motion.div key="vote" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.28 }} style={{ padding: '36px 32px' }}>
+                  <div style={{ marginBottom: '24px' }}>
+                    <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#0F1F2E', margin: '0 0 8px' }}>Cast Your Vote</h2>
+                    <p style={{ fontSize: '14px', color: '#6B7C93', lineHeight: 1.6, margin: 0 }}>
+                      Nominate the nurse you believe is most hardworking. This vote is anonymous and final.
+                    </p>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <div>
-                      <h2 className="text-[18px] font-bold text-[#1A2332] mb-1">Enter Access Code</h2>
-                      <p className="text-[14px] text-[#5A6B7F] leading-relaxed">
-                        Enter the unique code sent to you. Each code is valid for one vote only.
-                      </p>
-                    </div>
-
-                    <div className="space-y-3">
+                      <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#6B7C93', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>
+                        Nurse&apos;s Full Name
+                      </label>
                       <input
                         type="text"
-                        placeholder="MHC-XXXXXX"
-                        value={code}
-                        onChange={(e) => setCode(e.target.value.toUpperCase())}
-                        onKeyDown={(e) => e.key === 'Enter' && validateCode()}
-                        className="w-full bg-[#F8FAFB] border-2 border-[#E5EAF0] rounded-2xl px-5 py-4 text-center text-[20px] font-mono tracking-[0.2em] text-[#1A2332] focus:outline-none focus:border-[#0D7377] focus:ring-4 focus:ring-[#0D7377]/10 transition-all"
+                        placeholder="e.g. Nurse Jane Doe"
+                        value={nominee}
+                        onChange={e => setNominee(e.target.value)}
+                        autoFocus
+                        style={{
+                          width: '100%', background: '#F6F8FA', border: '2px solid #E8ECF0',
+                          borderRadius: '14px', padding: '16px 20px', fontSize: '16px',
+                          color: '#0F1F2E', boxSizing: 'border-box', outline: 'none', transition: 'border-color 0.2s',
+                        }}
+                        onFocus={e => e.target.style.borderColor = '#0D7377'}
+                        onBlur={e => e.target.style.borderColor = '#E8ECF0'}
                       />
-
-                      {error && (
-                        <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-2.5 p-3.5 rounded-xl bg-red-50 border border-red-100 text-red-600 text-[13px]">
-                          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                          {error}
-                        </motion.div>
-                      )}
-
-                      <button
-                        onClick={validateCode}
-                        disabled={loading || code.length < 5}
-                        className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-semibold text-[15px] text-white transition-all duration-300"
-                        style={{ background: 'linear-gradient(135deg, #0D7377 0%, #14919B 100%)', boxShadow: '0 4px 14px rgba(13,115,119,0.3)' }}
-                        onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-1px)')}
-                        onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
-                      >
-                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><span>Continue</span><ArrowRight className="w-4 h-4" /></>}
-                      </button>
                     </div>
 
-                    <div className="flex items-center justify-center gap-1.5 text-[12px] text-[#8E9BAA]">
-                      <ShieldCheck className="w-3.5 h-3.5" />
-                      Your identity remains 100% anonymous
-                    </div>
+                    {error && (
+                      <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} style={{
+                        display: 'flex', alignItems: 'flex-start', gap: '10px',
+                        padding: '12px 16px', borderRadius: '12px',
+                        background: '#FEF2F2', border: '1px solid #FECACA',
+                        color: '#DC2626', fontSize: '13px', lineHeight: 1.5,
+                      }}>
+                        <AlertCircle style={{ width: '16px', height: '16px', flexShrink: 0, marginTop: '1px' }} />
+                        {error}
+                      </motion.div>
+                    )}
+
+                    <button
+                      onClick={submitVote}
+                      disabled={loading || !nominee.trim()}
+                      style={{
+                        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                        padding: '16px', borderRadius: '14px', border: 'none', cursor: loading || !nominee.trim() ? 'not-allowed' : 'pointer',
+                        background: loading || !nominee.trim() ? '#B2D4D5' : 'linear-gradient(135deg, #0D7377 0%, #14919B 100%)',
+                        color: 'white', fontSize: '15px', fontWeight: 700,
+                        boxShadow: loading || !nominee.trim() ? 'none' : '0 4px 16px rgba(13,115,119,0.35)',
+                        transition: 'all 0.25s',
+                      }}
+                    >
+                      {loading ? <Loader2 style={{ width: '20px', height: '20px' }} /> : <><Heart style={{ width: '18px', height: '18px' }} /><span>Cast Anonymous Vote</span></>}
+                    </button>
+
+                    <button onClick={() => { setStep('code'); setError(null); }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', color: '#9DAAB8', fontSize: '13px', fontWeight: 500 }}>
+                      ← Go Back
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ── STEP 3 ── */}
+              {step === 'success' && (
+                <motion.div key="success" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4 }} style={{ padding: '48px 32px', textAlign: 'center' }}>
+                  <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.15, type: 'spring', stiffness: 200 }} style={{
+                    width: '80px', height: '80px', borderRadius: '50%',
+                    background: '#F0FDF4', border: '2px solid #BBF7D0',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    margin: '0 auto 24px',
+                  }}>
+                    <CheckCircle2 style={{ width: '40px', height: '40px', color: '#16A34A' }} />
                   </motion.div>
-                )}
-
-                {/* ── STEP 2: Vote ── */}
-                {step === 'vote' && (
-                  <motion.div key="vote" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.3 }} className="space-y-6">
-                    <div>
-                      <h2 className="text-[18px] font-bold text-[#1A2332] mb-1">Cast Your Vote</h2>
-                      <p className="text-[14px] text-[#5A6B7F] leading-relaxed">
-                        Nominate the nurse you believe is the most hardworking. This vote is final.
-                      </p>
+                  <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#0F1F2E', margin: '0 0 10px' }}>Vote Recorded!</h2>
+                  <p style={{ fontSize: '14px', color: '#6B7C93', lineHeight: 1.7, margin: '0 0 24px' }}>
+                    Thank you for participating in Nurses Week 2026.<br />Your anonymous vote has been securely recorded.
+                  </p>
+                  <div style={{ background: '#F6F8FA', border: '1px solid #E8ECF0', borderRadius: '16px', padding: '16px 20px' }}>
+                    <p style={{ fontSize: '13px', color: '#6B7C93', margin: '0 0 12px' }}>You can safely close this window.</p>
+                    <div style={{ height: '1px', background: '#E8ECF0', margin: '0 0 12px' }} />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: '#16A34A', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                      <ShieldCheck style={{ width: '14px', height: '14px' }} />
+                      Anonymous & Verified
                     </div>
+                  </div>
+                </motion.div>
+              )}
 
-                    <div className="space-y-3">
-                      <div>
-                        <label className="block text-[11px] font-bold text-[#5A6B7F] uppercase tracking-wider mb-2">Nurse&apos;s Full Name</label>
-                        <input
-                          type="text"
-                          placeholder="e.g. Nurse Jane Doe"
-                          value={nominee}
-                          onChange={(e) => setNominee(e.target.value)}
-                          autoFocus
-                          className="w-full bg-[#F8FAFB] border-2 border-[#E5EAF0] rounded-2xl px-5 py-4 text-[16px] text-[#1A2332] focus:outline-none focus:border-[#0D7377] focus:ring-4 focus:ring-[#0D7377]/10 transition-all"
-                        />
-                      </div>
-
-                      {error && (
-                        <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-2.5 p-3.5 rounded-xl bg-red-50 border border-red-100 text-red-600 text-[13px]">
-                          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                          {error}
-                        </motion.div>
-                      )}
-
-                      <button
-                        onClick={submitVote}
-                        disabled={loading || !nominee.trim()}
-                        className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-semibold text-[15px] text-white transition-all duration-300"
-                        style={{ background: 'linear-gradient(135deg, #0D7377 0%, #14919B 100%)', boxShadow: '0 4px 14px rgba(13,115,119,0.3)' }}
-                        onMouseEnter={e => (e.currentTarget.style.transform = 'translateY(-1px)')}
-                        onMouseLeave={e => (e.currentTarget.style.transform = 'translateY(0)')}
-                      >
-                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Heart className="w-4 h-4" /><span>Cast Anonymous Vote</span></>}
-                      </button>
-
-                      <button onClick={() => { setStep('code'); setError(null); }} className="w-full py-2.5 text-[13px] text-[#8E9BAA] hover:text-[#1A2332] transition-colors font-medium">
-                        ← Go Back
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* ── STEP 3: Success ── */}
-                {step === 'success' && (
-                  <motion.div key="success" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4 }} className="text-center space-y-6 py-4">
-                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.15, type: 'spring', stiffness: 220 }} className="mx-auto w-20 h-20 rounded-full bg-emerald-50 border-2 border-emerald-100 flex items-center justify-center">
-                      <CheckCircle2 className="w-10 h-10 text-emerald-500" />
-                    </motion.div>
-                    <div>
-                      <h2 className="text-[22px] font-bold text-[#1A2332] mb-2">Vote Recorded!</h2>
-                      <p className="text-[14px] text-[#5A6B7F] leading-relaxed">
-                        Thank you for participating in Nurses Week 2026. Your anonymous vote has been securely recorded.
-                      </p>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-[#F8FAFB] border border-[#E5EAF0] space-y-3">
-                      <p className="text-[13px] text-[#5A6B7F]">You can now safely close this window.</p>
-                      <div className="h-px bg-[#E5EAF0]" />
-                      <div className="flex items-center justify-center gap-1.5 text-[11px] font-bold text-emerald-600 uppercase tracking-wider">
-                        <ShieldCheck className="w-3.5 h-3.5" /> Anonymous & Verified
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-
-              </AnimatePresence>
-            </div>
+            </AnimatePresence>
           </div>
 
-          {/* ─── FOOTER ─── */}
-          <div className="mt-8 text-center space-y-1.5">
-            <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#8E9BAA]">Secure • Anonymous • Tamper-Proof</p>
-            <p className="text-[10px] text-[#C4CDD6]">© 2026 Maryland Healthcare. All rights reserved.</p>
+          {/* Footer */}
+          <div style={{ textAlign: 'center', marginTop: '28px' }}>
+            <p style={{ fontSize: '11px', fontWeight: 700, color: '#9DAAB8', textTransform: 'uppercase', letterSpacing: '0.2em', margin: '0 0 6px' }}>
+              Secure · Anonymous · Tamper-Proof
+            </p>
+            <p style={{ fontSize: '11px', color: '#C4CDD6', margin: 0 }}>
+              © 2026 Maryland Healthcare. All rights reserved.
+            </p>
           </div>
         </motion.div>
       </div>
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      `}</style>
     </div>
   );
 }
