@@ -9,14 +9,14 @@ import {
   Users, 
   Award, 
   ShieldAlert, 
-  ArrowUpRight, 
   BarChart3,
-  Calendar,
   CheckCircle2,
-  RefreshCw
+  RefreshCw,
+  Trophy,
+  Clock
 } from 'lucide-react';
 
-const TOTAL_STAFF = 300; // Total tokens generated
+const TOTAL_STAFF = 300;
 
 export default function ResultsPage() {
   const [results, setResults] = useState<{ nominee_name: string; count: number }[]>([]);
@@ -35,13 +35,13 @@ export default function ResultsPage() {
 
       if (error) throw error;
 
-      const counts = (data || []).reduce((acc: any, curr: any) => {
+      const counts = (data || []).reduce((acc: Record<string, number>, curr) => {
         acc[curr.nominee_name] = (acc[curr.nominee_name] || 0) + 1;
         return acc;
       }, {});
 
       const sorted = Object.entries(counts)
-        .map(([name, count]) => ({ nominee_name: name, count: count as number }))
+        .map(([name, count]) => ({ nominee_name: name, count }))
         .sort((a, b) => b.count - a.count);
 
       setResults(sorted);
@@ -64,40 +64,37 @@ export default function ResultsPage() {
     }
   };
 
+  // ─── AUTH GATE ───
   if (!authorized) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-background font-inter">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-secondary/10 rounded-full blur-[120px]" />
-        </div>
-        
+      <div className="min-h-screen flex items-center justify-center p-4">
         <motion.div 
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="glass-card p-10 w-full max-w-md relative z-10 border-white/10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card-elevated p-10 w-full max-w-md"
         >
-          <div className="text-center space-y-6 mb-8">
-            <div className="inline-flex p-4 rounded-3xl bg-secondary/10 border border-secondary/20">
-              <ShieldAlert className="w-8 h-8 text-secondary" />
+          <div className="text-center space-y-5 mb-8">
+            <div className="mx-auto w-16 h-16 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center">
+              <ShieldAlert className="w-7 h-7 text-primary" />
             </div>
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold tracking-tight outfit">Admin Access</h1>
-              <p className="text-gray-400 text-sm">Maryland Healthcare Transparent Dashboard</p>
+              <h1 className="text-2xl font-bold font-display text-text">Admin Access</h1>
+              <p className="text-sm text-text-muted">Enter password to view the voting dashboard.</p>
             </div>
           </div>
 
-          <form onSubmit={handleAuth} className="space-y-6">
+          <form onSubmit={handleAuth} className="space-y-5">
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-widest ml-1">Secure Password</label>
+              <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider">Secure Password</label>
               <input
                 type="password"
                 placeholder="••••••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
+                className="input-field"
               />
             </div>
-            <button type="submit" className="w-full btn-primary py-4 text-lg font-bold shadow-lg shadow-secondary/20">
+            <button type="submit" className="btn btn-primary w-full text-base">
               Enter Dashboard
             </button>
           </form>
@@ -107,212 +104,198 @@ export default function ResultsPage() {
   }
 
   const participationRate = Math.round((totalVotes / TOTAL_STAFF) * 100);
+  const leader = results[0];
 
+  // ─── DASHBOARD ───
   return (
-    <div className="min-h-screen bg-background font-inter text-white pb-20">
-      {/* Background Decor */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-secondary/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[20%] left-[-10%] w-[30%] h-[30%] bg-primary/20 rounded-full blur-[120px]" />
-      </div>
+    <div className="min-h-screen pb-20">
+      {/* Decorative Background */}
+      <div className="fixed inset-0 dot-pattern opacity-20 pointer-events-none" />
 
-      <nav className="border-b border-white/5 bg-black/20 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      {/* ─── NAVBAR ─── */}
+      <nav className="sticky top-0 z-50 border-b border-border bg-white/80 backdrop-blur-xl">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="bg-white p-2 rounded-xl shadow-sm border border-white/10">
-              <img src="/logo.png" alt="MHC" className="h-8 w-auto" />
-            </div>
-            <div className="h-6 w-px bg-white/10 mx-1" />
-            <h1 className="text-lg font-bold tracking-tight outfit leading-none">
-              MARYLAND <br/> <span className="text-secondary text-[10px] uppercase tracking-[0.2em]">Healthcare</span>
-            </h1>
+            <img src="/logo.png" alt="MHC" className="h-9 w-auto" />
+            <div className="hidden sm:block h-5 w-px bg-border" />
+            <span className="hidden sm:block text-xs font-bold text-text-muted uppercase tracking-[0.15em]">Admin Dashboard</span>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Live Portal</span>
+          <div className="flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/5 border border-success/15">
+              <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+              <span className="text-[10px] uppercase tracking-widest text-success font-bold">Live</span>
             </div>
             <button 
               onClick={fetchResults}
               disabled={loading}
-              className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+              className="p-2 rounded-xl border border-border bg-white hover:bg-surface-alt transition-colors"
             >
-              <RefreshCw className={`w-5 h-5 text-secondary ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 text-text-muted ${loading ? 'animate-spin' : ''}`} />
             </button>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-6 pt-12 space-y-10 relative z-10">
-        {/* Hero Header */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-secondary font-bold text-xs uppercase tracking-[0.3em] mb-2">
+      <main className="max-w-6xl mx-auto px-6 pt-10 space-y-8 relative z-10">
+        {/* ─── PAGE HEADER ─── */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-[0.2em]">
             <BarChart3 className="w-4 h-4" />
             Transparency Dashboard
           </div>
-          <h2 className="text-5xl font-black outfit leading-none tracking-tighter">
-            Nurses Week <span className="gradient-text">Results.</span>
+          <h2 className="text-4xl font-bold font-display text-text tracking-tight">
+            Nurses Week <span className="gradient-accent">Results</span>
           </h2>
-          <p className="text-gray-400 max-w-2xl text-lg">
-            A real-time, tamper-proof overview of the Most Hardworking Nurse nominations.
+          <p className="text-text-muted max-w-xl">
+            Real-time, tamper-proof overview of the Most Hardworking Nurse nominations.
           </p>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="glass-card p-8 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Users className="w-16 h-16" />
+        {/* ─── STATS GRID ─── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Total Votes */}
+          <div className="card p-6 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold text-text-muted uppercase tracking-wider">Total Votes</p>
+              <Users className="w-5 h-5 text-text-muted/40" />
             </div>
-            <div className="space-y-4">
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-[0.2em]">Total Votes Cast</p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-5xl font-black text-white outfit">{totalVotes}</span>
-                <span className="text-gray-500 font-medium">/ {TOTAL_STAFF} staff</span>
-              </div>
-              <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${participationRate}%` }}
-                  className="h-full bg-gradient-to-r from-primary to-secondary"
-                />
-              </div>
-              <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-                {participationRate}% Participation Rate
-              </p>
+            <p className="text-4xl font-black font-display text-text">{totalVotes}</p>
+            <div className="progress-track">
+              <div className="progress-fill" style={{ width: `${participationRate}%` }} />
             </div>
+            <p className="text-[11px] text-text-muted font-medium">{participationRate}% of {TOTAL_STAFF} staff</p>
           </div>
 
-          <div className="glass-card p-8 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <TrendingUp className="w-16 h-16" />
+          {/* Current Leader */}
+          <div className="card p-6 space-y-3 border-primary/20 bg-primary/[0.02]">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold text-primary uppercase tracking-wider">Current Leader</p>
+              <Trophy className="w-5 h-5 text-accent" />
             </div>
-            <div className="space-y-4">
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-[0.2em]">Current Leader</p>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-secondary/20 border border-secondary/30 flex items-center justify-center">
-                  <Award className="w-6 h-6 text-secondary" />
-                </div>
-                <div className="space-y-0.5">
-                  <h4 className="text-2xl font-bold truncate">
-                    {results[0]?.nominee_name || 'No votes yet'}
-                  </h4>
-                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-                    Leading with {results[0]?.count || 0} votes
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 text-[10px] text-green-500 font-bold uppercase tracking-widest mt-4">
-                <ArrowUpRight className="w-3 h-3" />
-                Verified & Secure
-              </div>
-            </div>
+            <p className="text-xl font-bold text-text truncate">{leader?.nominee_name || '—'}</p>
+            <p className="text-sm text-text-muted">
+              {leader ? `${leader.count} vote${leader.count > 1 ? 's' : ''}` : 'No votes yet'}
+            </p>
           </div>
 
-          <div className="glass-card p-8 border-white/10 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Calendar className="w-16 h-16" />
+          {/* Unique Nominees */}
+          <div className="card p-6 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold text-text-muted uppercase tracking-wider">Nominees</p>
+              <Award className="w-5 h-5 text-text-muted/40" />
             </div>
-            <div className="space-y-4">
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-[0.2em]">Last Sync</p>
-              <div className="space-y-1">
-                <h4 className="text-2xl font-bold outfit">
-                  {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                </h4>
-                <p className="text-sm text-gray-400">
-                  {lastUpdated.toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 text-[10px] text-secondary font-bold uppercase tracking-widest mt-4">
-                <CheckCircle2 className="w-3 h-3" />
-                Live Data Feed
-              </div>
+            <p className="text-4xl font-black font-display text-text">{results.length}</p>
+            <p className="text-[11px] text-text-muted font-medium">Unique nominations</p>
+          </div>
+
+          {/* Last Updated */}
+          <div className="card p-6 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-bold text-text-muted uppercase tracking-wider">Last Sync</p>
+              <Clock className="w-5 h-5 text-text-muted/40" />
             </div>
+            <p className="text-lg font-bold text-text">
+              {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </p>
+            <p className="text-[11px] text-text-muted font-medium">
+              {lastUpdated.toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })}
+            </p>
           </div>
         </div>
 
-        {/* Results List */}
-        <div className="space-y-6">
+        {/* ─── LEADERBOARD ─── */}
+        <div className="space-y-5">
           <div className="flex items-center justify-between">
-            <h3 className="text-2xl font-bold outfit">Detailed Standings</h3>
-            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-              Updated every 30 seconds
+            <h3 className="text-xl font-bold font-display text-text">Detailed Standings</h3>
+            <span className="text-[10px] text-text-muted font-bold uppercase tracking-widest">
+              {results.length} nominee{results.length !== 1 ? 's' : ''}
             </span>
           </div>
 
-          <div className="grid gap-3">
-            <AnimatePresence mode="popLayout">
-              {results.length === 0 ? (
-                <div className="text-center py-20 glass-card bg-white/[0.02] border-dashed border-white/10">
-                  <p className="text-gray-500 font-medium">Waiting for the first vote to be cast...</p>
-                </div>
-              ) : (
-                results.map((item, index) => (
-                  <motion.div
-                    key={item.nominee_name}
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="glass-card p-5 flex items-center justify-between group hover:bg-white/5 border-white/5 transition-all duration-300"
-                  >
-                    <div className="flex items-center gap-6">
-                      <div className="relative">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black outfit text-lg ${
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <AnimatePresence mode="popLayout">
+                {results.length === 0 ? (
+                  <div className="card p-16 text-center border-dashed">
+                    <p className="text-text-muted font-medium">Waiting for the first vote...</p>
+                  </div>
+                ) : (
+                  results.map((item, index) => {
+                    const percentage = totalVotes > 0 ? Math.round((item.count / totalVotes) * 100) : 0;
+                    return (
+                      <motion.div
+                        key={item.nominee_name}
+                        layout
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.04 }}
+                        className={`card p-5 flex items-center gap-5 transition-all duration-300 ${
+                          index === 0 ? 'border-primary/20 bg-primary/[0.02] shadow-sm shadow-primary/5' : ''
+                        }`}
+                      >
+                        {/* Rank */}
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 ${
                           index === 0 
-                            ? 'bg-gradient-to-br from-secondary to-primary text-white shadow-lg shadow-secondary/20' 
-                            : 'bg-white/5 text-white/40'
+                            ? 'bg-primary text-white shadow-sm' 
+                            : index === 1
+                              ? 'bg-primary/10 text-primary'
+                              : index === 2
+                                ? 'bg-accent/10 text-accent'
+                                : 'bg-surface-alt text-text-muted border border-border'
                         }`}>
                           {index + 1}
                         </div>
-                        {index === 0 && (
-                          <div className="absolute -top-1 -right-1">
-                            <div className="relative">
-                              <div className="absolute inset-0 bg-accent blur-md rounded-full animate-pulse" />
-                              <Award className="w-4 h-4 text-accent relative z-10 fill-accent" />
-                            </div>
+
+                        {/* Name */}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-base font-semibold text-text truncate">{item.nominee_name}</h4>
+                          {index === 0 && (
+                            <span className="text-[10px] text-primary font-bold uppercase tracking-widest">Leading</span>
+                          )}
+                        </div>
+
+                        {/* Visual Bar */}
+                        <div className="hidden sm:block w-28">
+                          <div className="progress-track">
+                            <div className="progress-fill" style={{ width: `${percentage}%` }} />
                           </div>
-                        )}
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-bold group-hover:text-secondary transition-colors">{item.nominee_name}</h3>
-                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-                          Nominee #{results.length - index}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-8">
-                      <div className="hidden sm:block w-32 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: `${(item.count / totalVotes) * 100}%` }}
-                          className="h-full bg-secondary/40"
-                        />
-                      </div>
-                      <div className="text-right min-w-[80px]">
-                        <p className="text-2xl font-black outfit">{item.count}</p>
-                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Votes</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))
-              )}
-            </AnimatePresence>
-          </div>
+                        </div>
+
+                        {/* Count */}
+                        <div className="text-right shrink-0">
+                          <p className="text-xl font-bold font-display text-text">{item.count}</p>
+                          <p className="text-[10px] text-text-muted font-medium">{percentage}%</p>
+                        </div>
+                      </motion.div>
+                    );
+                  })
+                )}
+              </AnimatePresence>
+            </div>
+          )}
         </div>
       </main>
 
-      <footer className="max-w-7xl mx-auto px-6 mt-20 pt-10 border-t border-white/5 text-center sm:text-left sm:flex sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-        <div className="flex items-center justify-center sm:justify-start gap-4">
-          <img src="/logo.png" alt="MHC" className="h-6 w-auto grayscale opacity-50" />
-          <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em]">
-            Maryland Healthcare • Admin Console
-          </p>
+      {/* ─── FOOTER ─── */}
+      <footer className="max-w-6xl mx-auto px-6 mt-16 pt-8 border-t border-border">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <img src="/logo.png" alt="MHC" className="h-6 w-auto opacity-40" />
+            <p className="text-[10px] text-text-muted font-bold uppercase tracking-[0.15em]">
+              Maryland Healthcare • Admin Console
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-3 h-3 text-success" />
+            <p className="text-[10px] text-text-muted font-bold uppercase tracking-[0.15em]">
+              Verified & Tamper-Proof
+            </p>
+          </div>
         </div>
-        <p className="text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em]">
-          Built with Integrity for Nurses Week 2026
-        </p>
       </footer>
     </div>
   );

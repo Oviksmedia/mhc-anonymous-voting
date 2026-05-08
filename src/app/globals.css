@@ -1,60 +1,160 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #002B5B;
+  --color-primary: #0D7377;
+  --color-primary-dark: #065A5E;
+  --color-primary-light: #14919B;
   --color-secondary: #00A3E0;
-  --color-accent: #FFD700;
-  --color-background: #001529; /* Deep Medical Navy */
-  --color-card: rgba(255, 255, 255, 0.03);
-  --color-border: rgba(255, 255, 255, 0.08);
+  --color-accent: #E8B931;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F8FAFB;
+  --color-surface-elevated: #FFFFFF;
+  --color-border: #E5EAF0;
+  --color-border-light: #F0F3F7;
+  --color-text: #1A2332;
+  --color-text-secondary: #5A6B7F;
+  --color-text-muted: #8E9BAA;
+  --color-success: #10B981;
+  --color-error: #EF4444;
 }
 
-:root {
-  --background: #001529;
-  --foreground: #ffffff;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(0, 163, 224, 0.05) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(0, 43, 91, 0.2) 0px, transparent 50%);
-  color: var(--foreground);
-  font-family: 'Inter', sans-serif;
-  overflow-x: hidden;
+  background: linear-gradient(180deg, #F0F7F8 0%, #FFFFFF 40%, #F8FAFB 100%);
+  color: var(--color-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
 }
 
-.glass-card {
-  background: var(--color-card);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--color-border);
-  border-radius: 24px;
+/* ─── TYPOGRAPHY ──────────────────────── */
+.font-display {
+  font-family: 'Outfit', system-ui, sans-serif;
 }
 
-.gradient-text {
-  background: linear-gradient(135deg, #fff 0%, #00A3E0 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* ─── CARD SYSTEM ─────────────────────── */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 4px 12px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.06),
+    0 12px 28px rgba(0, 0, 0, 0.04);
+}
+
+.card-elevated {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: 24px;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.04),
+    0 20px 48px rgba(0, 0, 0, 0.06);
+}
+
+/* ─── BUTTON SYSTEM ───────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  outline: none;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #003366 0%, #00A3E0 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
   color: white;
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 14px rgba(13, 115, 119, 0.3);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 163, 224, 0.3);
+  box-shadow: 0 8px 24px rgba(13, 115, 119, 0.35);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 .btn-primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
+}
+
+/* ─── INPUT SYSTEM ────────────────────── */
+.input-field {
+  width: 100%;
+  background: var(--color-surface-alt);
+  border: 2px solid var(--color-border);
+  border-radius: 14px;
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text);
+  transition: all 0.25s ease;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(13, 115, 119, 0.1);
+  background: white;
+}
+
+.input-field::placeholder {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+/* ─── DECORATIVE ──────────────────────── */
+.gradient-accent {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dot-pattern {
+  background-image: radial-gradient(circle, var(--color-border) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ─── PROGRESS BAR ────────────────────── */
+.progress-track {
+  width: 100%;
+  height: 8px;
+  background: var(--color-surface-alt);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  border-radius: 100px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
