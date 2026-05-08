@@ -87,12 +87,32 @@ export default function VotingSystem() {
           <motion.div 
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
-            className="inline-block p-3 rounded-2xl bg-primary/10 border border-primary/20 mb-4"
+            className="flex flex-col items-center gap-4 mb-4"
           >
-            <Award className="w-8 h-8 text-secondary" />
+            <div className="relative group">
+              <div className="absolute inset-0 bg-secondary/20 blur-xl rounded-full group-hover:bg-secondary/30 transition-colors" />
+              <img 
+                src="/logo.png" 
+                alt="Maryland Healthcare" 
+                className="h-20 w-auto relative z-10 drop-shadow-2xl"
+              />
+            </div>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold tracking-tight text-white/90">
+                MARYLAND <span className="text-secondary">HEALTHCARE</span>
+              </h1>
+              <div className="flex items-center justify-center gap-2">
+                <div className="h-px w-8 bg-white/10" />
+                <p className="text-[10px] uppercase tracking-[0.3em] text-gray-500 font-medium">Nurses Week 2026</p>
+                <div className="h-px w-8 bg-white/10" />
+              </div>
+            </div>
           </motion.div>
-          <h1 className="text-4xl font-bold gradient-text mb-2 tracking-tight">Nurses Week 2026</h1>
-          <p className="text-gray-400">Most Hardworking Nurse Award</p>
+          
+          <h2 className="text-3xl font-extrabold gradient-text mb-2 tracking-tight outfit">
+            Most Hardworking Nurse
+          </h2>
+          <p className="text-sm text-gray-400 font-medium italic">Honoring Excellence in Care</p>
         </div>
 
         <div className="glass-card p-8 shadow-2xl relative overflow-hidden">
@@ -213,20 +233,27 @@ export default function VotingSystem() {
                 key="success-step"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="text-center py-8 space-y-6"
+                className="text-center py-10 space-y-8"
               >
                 <div className="relative inline-block">
-                  <div className="absolute inset-0 bg-green-500/20 blur-2xl rounded-full" />
-                  <CheckCircle2 className="w-20 h-20 text-green-500 relative" />
+                  <div className="absolute inset-0 bg-green-500/20 blur-3xl rounded-full" />
+                  <div className="relative h-24 w-24 rounded-full bg-green-500/10 border-2 border-green-500/30 flex items-center justify-center mx-auto">
+                    <CheckCircle2 className="w-12 h-12 text-green-500" />
+                  </div>
                 </div>
                 
-                <div className="space-y-2">
-                  <h2 className="text-3xl font-bold">Vote Recorded!</h2>
-                  <p className="text-gray-400">Thank you for participating in Nurses Week 2026. Your contribution helps us celebrate excellence.</p>
+                <div className="space-y-3">
+                  <h2 className="text-3xl font-black outfit leading-tight">Your Vote is <span className="text-green-500">Live.</span></h2>
+                  <p className="text-gray-400 font-medium">Thank you for participating in Nurses Week 2026. Your contribution helps us celebrate excellence at Maryland Healthcare.</p>
                 </div>
 
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-sm text-gray-400">
-                  You can now close this window. Your access code has been deactivated.
+                <div className="p-5 rounded-2xl bg-white/5 border border-white/10 text-sm text-gray-400 space-y-4">
+                  <p className="font-medium">You can now safely close this window.</p>
+                  <div className="h-px w-full bg-white/5" />
+                  <div className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest font-bold text-gray-500">
+                    <ShieldCheck className="w-4 h-4" />
+                    Secure & Anonymous Receipt Verified
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -234,14 +261,20 @@ export default function VotingSystem() {
         </div>
 
         {/* Footer */}
-        <div className="mt-12 text-center space-y-4">
-          <div className="flex items-center justify-center gap-4 text-gray-500 grayscale opacity-50">
-            {/* Replace with actual logo if available */}
-            <span className="font-bold text-sm tracking-tighter">MARYLAND HEALTHCARE</span>
+        <div className="mt-12 text-center space-y-6">
+          <div className="flex flex-col items-center justify-center gap-3 grayscale opacity-30 group hover:opacity-100 transition-opacity">
+            <img src="/logo.png" alt="MHC" className="h-8 w-auto" />
+            <p className="text-[10px] text-gray-400 uppercase tracking-[0.4em] font-bold">
+              Maryland Healthcare
+            </p>
           </div>
-          <p className="text-[10px] text-gray-600 uppercase tracking-widest">
-            Secure • Anonymous • One Vote Per Person
-          </p>
+          <div className="flex items-center justify-center gap-4 text-gray-700">
+            <div className="h-px w-4 bg-white/5" />
+            <p className="text-[8px] uppercase tracking-widest font-black">
+              Authorized Digital Portal 2026
+            </p>
+            <div className="h-px w-4 bg-white/5" />
+          </div>
         </div>
       </motion.div>
     </div>
