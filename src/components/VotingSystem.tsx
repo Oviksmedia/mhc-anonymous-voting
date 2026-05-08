@@ -240,7 +240,7 @@ export default function VotingSystem() {
 
                       <button 
                         onClick={() => setShowHelp(true)}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9DAAB8', fontSize: '12px', fontWeight: 600, textDecoration: 'underline', marginTop: '4px' }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748B', fontSize: '13px', fontWeight: 800, textDecoration: 'underline', marginTop: '6px' }}
                       >
                         See how it works
                       </button>
