@@ -71,24 +71,35 @@ export default function VotingSystem() {
         <div style={{ position: 'absolute', top: '20%', left: '10%', width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255,255,255,0.15)' }} />
         <div style={{ position: 'absolute', top: '60%', right: '15%', width: '4px', height: '4px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)' }} />
 
-        <motion.div
-          initial={{ opacity: 0, y: -16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          {/* Logo on dark — perfectly readable */}
-          <div style={{
-            display: 'inline-block',
-            background: 'white',
-            borderRadius: '20px',
-            padding: '14px 20px',
-            marginBottom: '28px',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
-          }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          {/* Logo Card with Float */}
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1, y: [0, -5, 0] }}
+            transition={{ 
+              scale: { duration: 0.6, ease: "easeOut" },
+              opacity: { duration: 0.6 },
+              y: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+            }}
+            style={{
+              display: 'inline-block',
+              background: 'white',
+              borderRadius: '20px',
+              padding: '14px 20px',
+              marginBottom: '28px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+            }}
+          >
             <img src="/logo.png" alt="Maryland Healthcare" style={{ height: '52px', width: 'auto', display: 'block' }} />
-          </div>
+          </motion.div>
 
-          <div style={{ marginBottom: '12px' }}>
+          {/* Badge with Pulse Entrance */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            style={{ marginBottom: '12px' }}
+          >
             <span style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px',
               background: 'rgba(255,255,255,0.18)', border: '1.5px solid rgba(255,255,255,0.3)',
@@ -100,15 +111,27 @@ export default function VotingSystem() {
               <Star style={{ width: '12px', height: '12px', fill: '#FFD700', color: '#FFD700' }} />
               NURSES WEEK 2026
             </span>
-          </div>
+          </motion.div>
 
-          <h1 style={{ fontSize: '38px', fontWeight: 900, color: '#FFFFFF', margin: '14px 0 8px', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+          {/* Title with Staggered Reveal */}
+          <motion.h1 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+            style={{ fontSize: '38px', fontWeight: 900, color: '#FFFFFF', margin: '14px 0 8px', letterSpacing: '-0.02em', lineHeight: 1.1 }}
+          >
             Most Hardworking Nurse
-          </h1>
-          <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>
+          </motion.h1>
+          
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            style={{ fontSize: '15px', color: 'rgba(255,255,255,0.6)', margin: 0 }}
+          >
             Honoring Excellence in Care — Maryland Healthcare
-          </p>
-        </motion.div>
+          </motion.p>
+        </div>
       </div>
 
       {/* ═══════════════════════════════════════════════
