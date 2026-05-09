@@ -14,7 +14,29 @@ const outfit = Outfit({
 
 export const metadata: Metadata = {
   title: "Nurses Week 2026 | Maryland Healthcare",
-  description: "Anonymous voting for Most Hardworking Nurse",
+  description: "Cast your anonymous vote for the Most Hardworking Nurse of 2026.",
+  openGraph: {
+    title: "Nurses Week 2026 | Anonymous Voting",
+    description: "Cast your anonymous vote for the Most Hardworking Nurse of 2026.",
+    url: "https://mhc-anonymous-voting.vercel.app/",
+    siteName: "Maryland Healthcare",
+    images: [
+      {
+        url: "https://mhc-anonymous-voting.vercel.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Maryland Healthcare Nurses Week 2026",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Nurses Week 2026 | Anonymous Voting",
+    description: "Cast your anonymous vote for the Most Hardworking Nurse of 2026.",
+    images: ["https://mhc-anonymous-voting.vercel.app/og-image.png"],
+  },
 };
 
 export default function RootLayout({
