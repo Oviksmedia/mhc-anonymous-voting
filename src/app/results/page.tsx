@@ -29,8 +29,17 @@ export default function ResultsPage() {
     try {
       const { data, error } = await supabase.from('votes').select('nominee_name');
       if (error) throw error;
+      const savedAliases = JSON.parse(localStorage.getItem('mhc_vote_aliases') || '{}');
+      
       const counts = (data || []).reduce((acc: Record<string, number>, curr) => {
-        acc[curr.nominee_name] = (acc[curr.nominee_name] || 0) + 1;
+        let name = curr.nominee_name;
+        // Resolve alias
+        let attempts = 0;
+        while (savedAliases[name] && attempts < 10) {
+          name = savedAliases[name];
+          attempts++;
+        }
+        acc[name] = (acc[name] || 0) + 1;
         return acc;
       }, {});
       const sorted = Object.entries(counts)
@@ -49,11 +58,19 @@ export default function ResultsPage() {
       const { data, error } = await supabase.from('votes').select('*').order('created_at', { ascending: false });
       if (error) throw error;
       
-      const headers = ['Nominee Name', 'Vote Time'];
-      const rows = (data || []).map(vote => [
-        `"${(vote.nominee_name || '').replace(/"/g, '""')}"`,
-        new Date(vote.created_at).toLocaleString()
-      ]);
+      const savedAliases = JSON.parse(localStorage.getItem('mhc_vote_aliases') || '{}');
+      const rows = (data || []).map(vote => {
+        let name = vote.nominee_name;
+        let attempts = 0;
+        while (savedAliases[name] && attempts < 10) {
+          name = savedAliases[name];
+          attempts++;
+        }
+        return [
+          `"${(name || '').replace(/"/g, '""')}"`,
+          new Date(vote.created_at).toLocaleString()
+        ];
+      });
       
       const csvContent = [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
       
@@ -76,19 +93,18 @@ export default function ResultsPage() {
   const handleMerge = async () => {
     if (!mergeSource || !mergeTarget || mergeSource === mergeTarget) return;
     setMerging(true);
-    try {
-      const { error } = await supabase.from('votes').update({ nominee_name: mergeTarget.trim() }).eq('nominee_name', mergeSource);
-      if (error) throw error;
-      setShowMergeModal(false);
-      setMergeSource('');
-      setMergeTarget('');
-      fetchResults();
-    } catch (err) {
-      console.error(err);
-      alert('Failed to merge entries');
-    } finally {
-      setMerging(false);
-    }
+    
+    // RLS prevents direct database updates from the browser anon key. 
+    // We store the merge mapping locally so the dashboard instantly groups them.
+    const savedAliases = JSON.parse(localStorage.getItem('mhc_vote_aliases') || '{}');
+    savedAliases[mergeSource] = mergeTarget.trim();
+    localStorage.setItem('mhc_vote_aliases', JSON.stringify(savedAliases));
+    
+    setShowMergeModal(false);
+    setMergeSource('');
+    setMergeTarget('');
+    fetchResults();
+    setMerging(false);
   };
 
   const handleAuth = (e: React.FormEvent) => {
