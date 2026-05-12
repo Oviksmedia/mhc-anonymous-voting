@@ -29,7 +29,19 @@ export default function ResultsPage() {
     try {
       const { data, error } = await supabase.from('votes').select('nominee_name');
       if (error) throw error;
-      const savedAliases = JSON.parse(localStorage.getItem('mhc_vote_aliases') || '{}');
+      
+      const HARDCODED_ALIASES: Record<string, string> = {
+        'Nurse Aeyo': 'Nurse Eyo',
+        'Matron': 'Nurse Enuma Ngozi',
+        'Nurse Chidinma(Married)': 'Nurse Chidimma Nwaneri',
+        'Nurse Ayo Abigail Udogadi': 'Nurse Eyo',
+        'Nurse Jessica': 'Nurse Obunezi Jessica',
+        'Nurse Eyoh': 'Nurse Eyo',
+        'Nurse Eyo, matron': 'Nurse Eyo'
+      };
+      
+      const localAliases = JSON.parse(localStorage.getItem('mhc_vote_aliases') || '{}');
+      const savedAliases = { ...HARDCODED_ALIASES, ...localAliases };
       
       const counts = (data || []).reduce((acc: Record<string, number>, curr) => {
         let name = curr.nominee_name;
@@ -58,7 +70,19 @@ export default function ResultsPage() {
       const { data, error } = await supabase.from('votes').select('*').order('created_at', { ascending: false });
       if (error) throw error;
       
-      const savedAliases = JSON.parse(localStorage.getItem('mhc_vote_aliases') || '{}');
+      const HARDCODED_ALIASES: Record<string, string> = {
+        'Nurse Aeyo': 'Nurse Eyo',
+        'Matron': 'Nurse Enuma Ngozi',
+        'Nurse Chidinma(Married)': 'Nurse Chidimma Nwaneri',
+        'Nurse Ayo Abigail Udogadi': 'Nurse Eyo',
+        'Nurse Jessica': 'Nurse Obunezi Jessica',
+        'Nurse Eyoh': 'Nurse Eyo',
+        'Nurse Eyo, matron': 'Nurse Eyo'
+      };
+      
+      const localAliases = JSON.parse(localStorage.getItem('mhc_vote_aliases') || '{}');
+      const savedAliases = { ...HARDCODED_ALIASES, ...localAliases };
+      
       const rows = (data || []).map(vote => {
         let name = vote.nominee_name;
         let attempts = 0;
