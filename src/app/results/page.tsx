@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Loader2, TrendingUp, Users, Award, 
   ShieldAlert, BarChart3, CheckCircle2, 
-  RefreshCw, Trophy, Clock, Lock, ArrowLeft, Download
+  RefreshCw, Trophy, Clock, Lock, ArrowLeft, Download, GitMerge
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -19,6 +19,10 @@ export default function ResultsPage() {
   const [authorized, setAuthorized] = useState(false);
   const [password, setPassword] = useState('');
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [showMergeModal, setShowMergeModal] = useState(false);
+  const [mergeSource, setMergeSource] = useState('');
+  const [mergeTarget, setMergeTarget] = useState('');
+  const [merging, setMerging] = useState(false);
 
   const fetchResults = async () => {
     setLoading(true);
@@ -66,6 +70,24 @@ export default function ResultsPage() {
       alert('Failed to export CSV');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleMerge = async () => {
+    if (!mergeSource || !mergeTarget || mergeSource === mergeTarget) return;
+    setMerging(true);
+    try {
+      const { error } = await supabase.from('votes').update({ nominee_name: mergeTarget.trim() }).eq('nominee_name', mergeSource);
+      if (error) throw error;
+      setShowMergeModal(false);
+      setMergeSource('');
+      setMergeTarget('');
+      fetchResults();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to merge entries');
+    } finally {
+      setMerging(false);
     }
   };
 
@@ -132,7 +154,11 @@ export default function ResultsPage() {
                 <div style={{ height: '24px', width: '1px', background: 'rgba(255,255,255,0.2)' }} />
                 <span style={{ color: 'white', fontSize: '12px', fontWeight: 700, letterSpacing: '0.1em', opacity: 0.8 }}>ADMIN DASHBOARD</span>
              </div>
-             <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button onClick={() => setShowMergeModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', padding: '6px 14px', cursor: 'pointer', color: 'white', fontWeight: 600, fontSize: '12px', transition: 'all 0.2s' }}>
+                  <GitMerge style={{ width: '14px' }} />
+                  Merge Entries
+                </button>
                 <button onClick={exportToCSV} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', padding: '6px 14px', cursor: 'pointer', color: 'white', fontWeight: 600, fontSize: '12px', transition: 'all 0.2s' }}>
                   <Download style={{ width: '14px' }} />
                   Export Data
@@ -236,6 +262,47 @@ export default function ResultsPage() {
           </div>
         </div>
       </div>
+
+      {/* Merge Modal */}
+      {showMergeModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(5, 46, 48, 0.8)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} style={{ background: 'white', borderRadius: '24px', padding: '32px', width: '100%', maxWidth: '400px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+            <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#0F1F2E', margin: '0 0 8px 0' }}>Merge Entries</h3>
+            <p style={{ fontSize: '14px', color: '#6B7C93', margin: '0 0 24px 0' }}>Combine votes from a misspelled name into the correct name permanently.</p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#0F1F2E', marginBottom: '8px', textTransform: 'uppercase' }}>Misspelled Name</label>
+                <select value={mergeSource} onChange={(e) => setMergeSource(e.target.value)} style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid #E8ECF0', outline: 'none', background: '#F8FAFB', fontSize: '14px', boxSizing: 'border-box' }}>
+                  <option value="">Select incorrect name...</option>
+                  {results.map(r => <option key={r.nominee_name} value={r.nominee_name}>{r.nominee_name} ({r.count} votes)</option>)}
+                </select>
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#0F1F2E', marginBottom: '8px', textTransform: 'uppercase' }}>Correct Name</label>
+                <input 
+                  list="target-names" 
+                  value={mergeTarget} 
+                  onChange={(e) => setMergeTarget(e.target.value)} 
+                  placeholder="Select or type correct name..."
+                  style={{ width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1px solid #E8ECF0', outline: 'none', background: '#F8FAFB', fontSize: '14px', boxSizing: 'border-box' }}
+                />
+                <datalist id="target-names">
+                  {results.map(r => <option key={r.nominee_name} value={r.nominee_name} />)}
+                </datalist>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button onClick={() => setShowMergeModal(false)} style={{ flex: 1, padding: '14px', borderRadius: '12px', border: '1px solid #E8ECF0', background: 'white', color: '#0F1F2E', fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' }}>Cancel</button>
+              <button onClick={handleMerge} disabled={merging || !mergeSource || !mergeTarget || mergeSource === mergeTarget} style={{ flex: 1, padding: '14px', borderRadius: '12px', border: 'none', background: '#0D7377', color: 'white', fontWeight: 600, cursor: (merging || !mergeSource || !mergeTarget || mergeSource === mergeTarget) ? 'not-allowed' : 'pointer', opacity: (merging || !mergeSource || !mergeTarget || mergeSource === mergeTarget) ? 0.5 : 1, transition: 'opacity 0.2s' }}>
+                {merging ? 'Merging...' : 'Merge Votes'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
       
       <style>{`
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
