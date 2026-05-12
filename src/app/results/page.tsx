@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Loader2, TrendingUp, Users, Award, 
   ShieldAlert, BarChart3, CheckCircle2, 
-  RefreshCw, Trophy, Clock, Lock, ArrowLeft
+  RefreshCw, Trophy, Clock, Lock, ArrowLeft, Download
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -37,6 +37,36 @@ export default function ResultsPage() {
       setLastUpdated(new Date());
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
+  };
+
+  const exportToCSV = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase.from('votes').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      
+      const headers = ['Nominee Name', 'Vote Time'];
+      const rows = (data || []).map(vote => [
+        `"${(vote.nominee_name || '').replace(/"/g, '""')}"`,
+        new Date(vote.created_at).toLocaleString()
+      ]);
+      
+      const csvContent = [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `nurses_week_votes_raw_${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to export CSV');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAuth = (e: React.FormEvent) => {
@@ -103,6 +133,10 @@ export default function ResultsPage() {
                 <span style={{ color: 'white', fontSize: '12px', fontWeight: 700, letterSpacing: '0.1em', opacity: 0.8 }}>ADMIN DASHBOARD</span>
              </div>
              <div style={{ display: 'flex', gap: '12px' }}>
+                <button onClick={exportToCSV} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', padding: '6px 14px', cursor: 'pointer', color: 'white', fontWeight: 600, fontSize: '12px', transition: 'all 0.2s' }}>
+                  <Download style={{ width: '14px' }} />
+                  Export Data
+                </button>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 14px', background: 'rgba(255,255,255,0.1)', borderRadius: '100px', border: '1px solid rgba(255,255,255,0.1)' }}>
                   <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', boxShadow: '0 0 10px #10B981' }} />
                   <span style={{ color: 'white', fontSize: '11px', fontWeight: 700 }}>LIVE SYNC</span>
